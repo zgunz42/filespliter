@@ -6,6 +6,9 @@ on:
       - 'v*.*.*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -14,8 +17,8 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
       version: ${{ steps.get_version.outputs.version }}
+      tag_name: ${{ github.ref_name }}
     steps:
       - name: Get version from tag
         id: get_version
@@ -23,12 +26,10 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ steps.get_version.outputs.version }}
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
           body: |
@@ -57,6 +58,8 @@ jobs:
 
             ### Installation
             Download the binary for your platform, make it executable, and run it.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-release:
     name: Build Release
@@ -172,64 +175,40 @@ jobs:
 
       - name: Upload CLI Release Asset (tar.gz)
         if: matrix.os != 'windows-latest'
-        uses: actions/upload-release-asset@v1
+        run: gh release upload ${{ needs.create-release.outputs.tag_name }} ./${{ matrix.asset_name }}.tar.gz --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./${{ matrix.asset_name }}.tar.gz
-          asset_name: ${{ matrix.asset_name }}.tar.gz
-          asset_content_type: application/gzip
 
       - name: Upload GUI Release Asset (tar.gz)
         if: matrix.os != 'windows-latest'
-        uses: actions/upload-release-asset@v1
+        run: |
+          GUI_TAR=$(echo "./filesplitter-gui-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'linux-amd64' || matrix.target == 'aarch64-unknown-linux-gnu' && 'linux-arm64' || matrix.target == 'x86_64-apple-darwin' && 'macos-amd64' || 'macos-arm64' }}.tar.gz")
+          gh release upload ${{ needs.create-release.outputs.tag_name }} ${GUI_TAR} --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./filesplitter-gui-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'linux-amd64' || matrix.target == 'aarch64-unknown-linux-gnu' && 'linux-arm64' || matrix.target == 'x86_64-apple-darwin' && 'macos-amd64' || 'macos-arm64' }}.tar.gz
-          asset_name: filesplitter-gui-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'linux-amd64' || matrix.target == 'aarch64-unknown-linux-gnu' && 'linux-arm64' || matrix.target == 'x86_64-apple-darwin' && 'macos-amd64' || 'macos-arm64' }}.tar.gz
-          asset_content_type: application/gzip
 
       - name: Upload CLI Release Asset (zip)
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-release-asset@v1
+        run: gh release upload ${{ needs.create-release.outputs.tag_name }} ./${{ matrix.asset_name }}.zip --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./${{ matrix.asset_name }}.zip
-          asset_name: ${{ matrix.asset_name }}.zip
-          asset_content_type: application/zip
 
       - name: Upload GUI Release Asset (zip)
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-release-asset@v1
+        run: gh release upload ${{ needs.create-release.outputs.tag_name }} ./filesplitter-gui-windows-amd64.exe.zip --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./filesplitter-gui-windows-amd64.exe.zip
-          asset_name: filesplitter-gui-windows-amd64.exe.zip
-          asset_content_type: application/zip
 
       - name: Upload CLI raw binary
-        uses: actions/upload-release-asset@v1
+        run: gh release upload ${{ needs.create-release.outputs.tag_name }} ./target/${{ matrix.target }}/release/${{ matrix.artifact_name }} --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
-          asset_name: ${{ matrix.asset_name }}
-          asset_content_type: application/octet-stream
 
       - name: Upload GUI raw binary
-        uses: actions/upload-release-asset@v1
+        run: |
+          GUI_BIN="./target/${{ matrix.target }}/release/${{ matrix.os == 'windows-latest' && 'filesplitter-gui.exe' || 'filesplitter-gui' }}"
+          GUI_NAME="filesplitter-gui-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'linux-amd64' || matrix.target == 'aarch64-unknown-linux-gnu' && 'linux-arm64' || matrix.target == 'x86_64-apple-darwin' && 'macos-amd64' || matrix.target == 'aarch64-apple-darwin' && 'macos-arm64' || 'windows-amd64.exe' }}"
+          cp ${GUI_BIN} ./${GUI_NAME}
+          gh release upload ${{ needs.create-release.outputs.tag_name }} ./${GUI_NAME} --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./target/${{ matrix.target }}/release/${{ matrix.os == 'windows-latest' && 'filesplitter-gui.exe' || 'filesplitter-gui' }}
-          asset_name: filesplitter-gui-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'linux-amd64' || matrix.target == 'aarch64-unknown-linux-gnu' && 'linux-arm64' || matrix.target == 'x86_64-apple-darwin' && 'macos-amd64' || matrix.target == 'aarch64-apple-darwin' && 'macos-arm64' || 'windows-amd64.exe' }}
-          asset_content_type: application/octet-stream
