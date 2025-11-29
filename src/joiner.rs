@@ -34,16 +34,32 @@ impl FileJoiner {
     }
 
     pub fn join(&self) -> Result<PathBuf> {
-        let total_size: u64 = self.part_files.iter()
+        let total_size: u64 = self
+            .part_files
+            .iter()
             .map(|p| std::fs::metadata(p).map(|m| m.len()).unwrap_or(0))
             .sum();
 
-        println!("\n{}", "═══════════════════════════════════════".bright_magenta());
+        println!(
+            "\n{}",
+            "═══════════════════════════════════════".bright_magenta()
+        );
         println!("{}", "           FILE JOINER".bright_magenta().bold());
-        println!("{}", "═══════════════════════════════════════".bright_magenta());
+        println!(
+            "{}",
+            "═══════════════════════════════════════".bright_magenta()
+        );
 
-        println!("\n{} {}", "Number of parts:".green().bold(), self.part_files.len().to_string().cyan());
-        println!("{} {}", "Total size:".green().bold(), format_bytes(total_size).yellow());
+        println!(
+            "\n{} {}",
+            "Number of parts:".green().bold(),
+            self.part_files.len().to_string().cyan()
+        );
+        println!(
+            "{} {}",
+            "Total size:".green().bold(),
+            format_bytes(total_size).yellow()
+        );
         println!("{} {:?}\n", "Output file:".green().bold(), self.output_path);
 
         let pb = ProgressBar::new(total_size);
@@ -54,14 +70,18 @@ impl FileJoiner {
                 .progress_chars("█▓▒░ "),
         );
 
-        let output_file = File::create(&self.output_path)
-            .context("Failed to create output file")?;
+        let output_file =
+            File::create(&self.output_path).context("Failed to create output file")?;
 
         let mut writer = BufWriter::with_capacity(BUFFER_SIZE, output_file);
         let mut total_bytes = 0u64;
 
         for (index, part_path) in self.part_files.iter().enumerate() {
-            pb.set_message(format!("Joining part {}/{}", index + 1, self.part_files.len()));
+            pb.set_message(format!(
+                "Joining part {}/{}",
+                index + 1,
+                self.part_files.len()
+            ));
 
             let part_file = File::open(part_path)
                 .context(format!("Failed to open part file: {:?}", part_path))?;
@@ -70,14 +90,16 @@ impl FileJoiner {
             let mut buffer = vec![0u8; BUFFER_SIZE];
 
             loop {
-                let bytes_read = reader.read(&mut buffer)
+                let bytes_read = reader
+                    .read(&mut buffer)
                     .context("Failed to read from part file")?;
 
                 if bytes_read == 0 {
                     break;
                 }
 
-                writer.write_all(&buffer[..bytes_read])
+                writer
+                    .write_all(&buffer[..bytes_read])
                     .context("Failed to write to output file")?;
 
                 total_bytes += bytes_read as u64;
@@ -85,22 +107,36 @@ impl FileJoiner {
             }
         }
 
-        writer.flush()
-            .context("Failed to flush output file")?;
+        writer.flush().context("Failed to flush output file")?;
 
         pb.finish_with_message("Join complete!".green().to_string());
 
-        println!("\n{}", "═══════════════════════════════════════".bright_magenta());
-        println!("{} {}", "✓ Successfully joined".green().bold(), format_bytes(total_bytes).cyan().bold());
-        println!("{}", "═══════════════════════════════════════".bright_magenta());
+        println!(
+            "\n{}",
+            "═══════════════════════════════════════".bright_magenta()
+        );
+        println!(
+            "{} {}",
+            "✓ Successfully joined".green().bold(),
+            format_bytes(total_bytes).cyan().bold()
+        );
+        println!(
+            "{}",
+            "═══════════════════════════════════════".bright_magenta()
+        );
 
-        println!("\n{} {:?}\n", "Output file:".yellow().bold(), self.output_path);
+        println!(
+            "\n{} {:?}\n",
+            "Output file:".yellow().bold(),
+            self.output_path
+        );
 
         Ok(self.output_path.clone())
     }
 
     fn find_all_parts(first_part: &Path) -> Result<Vec<PathBuf>> {
-        let file_name = first_part.file_name()
+        let file_name = first_part
+            .file_name()
             .context("Invalid file name")?
             .to_string_lossy();
 
@@ -111,8 +147,7 @@ impl FileJoiner {
             anyhow::bail!("First part file must have .partXXX extension");
         };
 
-        let parent_dir = first_part.parent()
-            .unwrap_or_else(|| Path::new("."));
+        let parent_dir = first_part.parent().unwrap_or_else(|| Path::new("."));
 
         let mut parts = Vec::new();
         let mut part_number = 1;
@@ -130,7 +165,10 @@ impl FileJoiner {
         }
 
         if parts.is_empty() {
-            anyhow::bail!("No sequential part files found starting from: {:?}", first_part);
+            anyhow::bail!(
+                "No sequential part files found starting from: {:?}",
+                first_part
+            );
         }
 
         Ok(parts)
@@ -148,4 +186,76 @@ fn format_bytes(bytes: u64) -> String {
     }
 
     format!("{:.2} {}", size, UNITS[unit_index])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use std::io::{Read, Write};
+
+    #[test]
+    fn test_format_bytes() {
+        assert_eq!(format_bytes(512), "512.00 B");
+        assert_eq!(format_bytes(2048), "2.00 KB");
+        assert_eq!(format_bytes(5242880), "5.00 MB");
+    }
+
+    #[test]
+    fn test_new_validates_first_part_exists() {
+        let result = FileJoiner::new("nonexistent.part001", "output.bin");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_find_all_parts() {
+        fs::File::create("test.bin.part001")
+            .unwrap()
+            .write_all(b"part1")
+            .unwrap();
+        fs::File::create("test.bin.part002")
+            .unwrap()
+            .write_all(b"part2")
+            .unwrap();
+        fs::File::create("test.bin.part003")
+            .unwrap()
+            .write_all(b"part3")
+            .unwrap();
+
+        let joiner = FileJoiner::new("test.bin.part001", "output.bin").unwrap();
+        assert_eq!(joiner.part_files.len(), 3);
+
+        fs::remove_file("test.bin.part001").unwrap();
+        fs::remove_file("test.bin.part002").unwrap();
+        fs::remove_file("test.bin.part003").unwrap();
+    }
+
+    #[test]
+    fn test_join_restores_original() {
+        let original_data = b"Hello, this is test data for file joining!";
+
+        fs::File::create("join_test.dat.part001")
+            .unwrap()
+            .write_all(&original_data[0..20])
+            .unwrap();
+        fs::File::create("join_test.dat.part002")
+            .unwrap()
+            .write_all(&original_data[20..])
+            .unwrap();
+
+        let joiner = FileJoiner::new("join_test.dat.part001", "join_test_output.dat").unwrap();
+        joiner.join().unwrap();
+
+        let mut restored = Vec::new();
+        fs::File::open("join_test_output.dat")
+            .unwrap()
+            .read_to_end(&mut restored)
+            .unwrap();
+
+        assert_eq!(restored, original_data);
+
+        fs::remove_file("join_test.dat.part001").unwrap();
+        fs::remove_file("join_test.dat.part002").unwrap();
+        fs::remove_file("join_test_output.dat").unwrap();
+    }
 }

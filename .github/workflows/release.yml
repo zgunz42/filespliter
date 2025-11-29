@@ -1,0 +1,235 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Get version from tag
+        id: get_version
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          body: |
+            ## File Splitter ${{ steps.get_version.outputs.version }}
+
+            Fast, efficient file splitter and joiner with colored output and progress bars.
+
+            ### Features
+            - Split large files into smaller parts
+            - Join parts back into original file
+            - Real-time progress bars with ETA
+            - Colored terminal output
+            - Cross-platform GUI application
+            - Support for files up to 18 exabytes
+
+            ### Downloads
+            **CLI Application:**
+            - **Linux**: filesplitter-linux-amd64, filesplitter-linux-arm64
+            - **macOS**: filesplitter-macos-amd64, filesplitter-macos-arm64
+            - **Windows**: filesplitter-windows-amd64.exe
+
+            **GUI Application:**
+            - **Linux**: filesplitter-gui-linux-amd64, filesplitter-gui-linux-arm64
+            - **macOS**: filesplitter-gui-macos-amd64, filesplitter-gui-macos-arm64
+            - **Windows**: filesplitter-gui-windows-amd64.exe
+
+            ### Installation
+            Download the binary for your platform, make it executable, and run it.
+
+  build-release:
+    name: Build Release
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          # Linux AMD64
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: filesplitter
+            asset_name: filesplitter-linux-amd64
+
+          # Linux ARM64
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            artifact_name: filesplitter
+            asset_name: filesplitter-linux-arm64
+
+          # macOS AMD64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: filesplitter
+            asset_name: filesplitter-macos-amd64
+
+          # macOS ARM64 (Apple Silicon)
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: filesplitter
+            asset_name: filesplitter-macos-arm64
+
+          # Windows AMD64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: filesplitter.exe
+            asset_name: filesplitter-windows-amd64.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross-compilation tools (Linux ARM64)
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-${{ matrix.target }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-${{ matrix.target }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache target directory
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-${{ matrix.target }}-release-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build release binary
+        run: cargo build --release --target ${{ matrix.target }} --verbose --all
+        env:
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+
+      - name: Strip CLI binary (Linux and macOS)
+        if: matrix.os != 'windows-latest'
+        run: strip target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+
+      - name: Strip GUI binary (Linux and macOS)
+        if: matrix.os != 'windows-latest'
+        run: strip target/${{ matrix.target }}/release/filesplitter-gui
+
+      - name: Compress CLI binary (Linux and macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          tar czf ${{ matrix.asset_name }}.tar.gz ${{ matrix.artifact_name }}
+          mv ${{ matrix.asset_name }}.tar.gz ../../..
+
+      - name: Compress GUI binary (Linux and macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          GUI_NAME=$(echo "${{ matrix.asset_name }}" | sed 's/filesplitter/filesplitter-gui/')
+          tar czf ${GUI_NAME}.tar.gz filesplitter-gui
+          mv ${GUI_NAME}.tar.gz ../../..
+
+      - name: Compress CLI binary (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          7z a ${{ matrix.asset_name }}.zip ${{ matrix.artifact_name }}
+          mv ${{ matrix.asset_name }}.zip ../../..
+
+      - name: Compress GUI binary (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          7z a filesplitter-gui-windows-amd64.exe.zip filesplitter-gui.exe
+          mv filesplitter-gui-windows-amd64.exe.zip ../../..
+
+      - name: Upload CLI Release Asset (tar.gz)
+        if: matrix.os != 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./${{ matrix.asset_name }}.tar.gz
+          asset_name: ${{ matrix.asset_name }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload GUI Release Asset (tar.gz)
+        if: matrix.os != 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./filesplitter-gui-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'linux-amd64' || matrix.target == 'aarch64-unknown-linux-gnu' && 'linux-arm64' || matrix.target == 'x86_64-apple-darwin' && 'macos-amd64' || 'macos-arm64' }}.tar.gz
+          asset_name: filesplitter-gui-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'linux-amd64' || matrix.target == 'aarch64-unknown-linux-gnu' && 'linux-arm64' || matrix.target == 'x86_64-apple-darwin' && 'macos-amd64' || 'macos-arm64' }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload CLI Release Asset (zip)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./${{ matrix.asset_name }}.zip
+          asset_name: ${{ matrix.asset_name }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload GUI Release Asset (zip)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./filesplitter-gui-windows-amd64.exe.zip
+          asset_name: filesplitter-gui-windows-amd64.exe.zip
+          asset_content_type: application/zip
+
+      - name: Upload CLI raw binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          asset_name: ${{ matrix.asset_name }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload GUI raw binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./target/${{ matrix.target }}/release/${{ matrix.os == 'windows-latest' && 'filesplitter-gui.exe' || 'filesplitter-gui' }}
+          asset_name: filesplitter-gui-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'linux-amd64' || matrix.target == 'aarch64-unknown-linux-gnu' && 'linux-arm64' || matrix.target == 'x86_64-apple-darwin' && 'macos-amd64' || matrix.target == 'aarch64-apple-darwin' && 'macos-arm64' || 'windows-amd64.exe' }}
+          asset_content_type: application/octet-stream

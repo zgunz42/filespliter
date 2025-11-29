@@ -1,1 +1,22 @@
+# Rust build artifacts
 /target
+Cargo.lock
+
+# Test files
+*.rar
+*.part*
+*_restored.*
+test_*
+demo.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# CI/CD
+*.tar.gz
+*.zip

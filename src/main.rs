@@ -1,5 +1,5 @@
-mod splitter;
 mod joiner;
+mod splitter;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -22,7 +22,11 @@ enum Commands {
         #[arg(short, long, help = "Input file to split")]
         input: PathBuf,
 
-        #[arg(short, long, help = "Size of each part in bytes (e.g., 4294967296 for 4GB)")]
+        #[arg(
+            short,
+            long,
+            help = "Size of each part in bytes (e.g., 4294967296 for 4GB)"
+        )]
         size: u64,
     },
 
@@ -61,10 +65,24 @@ fn run() -> Result<()> {
 }
 
 fn print_banner() {
-    println!("\n{}", "╔═══════════════════════════════════════╗".bright_blue());
-    println!("{}", "║       FILE SPLITTER & JOINER         ║".bright_blue().bold());
-    println!("{}", "║         Fast • Efficient • Safe       ║".bright_blue());
-    println!("{}", "╚═══════════════════════════════════════╝".bright_blue());
+    println!(
+        "\n{}",
+        "╔═══════════════════════════════════════╗".bright_blue()
+    );
+    println!(
+        "{}",
+        "║       FILE SPLITTER & JOINER         ║"
+            .bright_blue()
+            .bold()
+    );
+    println!(
+        "{}",
+        "║         Fast • Efficient • Safe       ║".bright_blue()
+    );
+    println!(
+        "{}",
+        "╚═══════════════════════════════════════╝".bright_blue()
+    );
 }
 
 fn handle_split(input: PathBuf, size: u64) -> Result<()> {

@@ -1,0 +1,34 @@
+# Configuration for cargo-deny
+# https://embarkstudios.github.io/cargo-deny/
+
+[advisories]
+# Security vulnerabilities
+vulnerability = "deny"
+unmaintained = "warn"
+yanked = "warn"
+notice = "warn"
+
+[licenses]
+# License restrictions
+unlicensed = "deny"
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-DFS-2016",
+]
+copyleft = "warn"
+default = "deny"
+
+[bans]
+# Banned crates
+multiple-versions = "warn"
+wildcards = "warn"
+
+[sources]
+# Source restrictions
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-git = []

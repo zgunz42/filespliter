@@ -31,23 +31,41 @@ impl FileSplitter {
     }
 
     pub fn split(&self) -> Result<Vec<PathBuf>> {
-        let file = File::open(&self.input_path)
-            .context("Failed to open input file")?;
+        let file = File::open(&self.input_path).context("Failed to open input file")?;
 
-        let file_size = file.metadata()
+        let file_size = file
+            .metadata()
             .context("Failed to get file metadata")?
             .len();
 
-        println!("\n{}", "═══════════════════════════════════════".bright_cyan());
+        println!(
+            "\n{}",
+            "═══════════════════════════════════════".bright_cyan()
+        );
         println!("{}", "          FILE SPLITTER".bright_cyan().bold());
-        println!("{}", "═══════════════════════════════════════".bright_cyan());
+        println!(
+            "{}",
+            "═══════════════════════════════════════".bright_cyan()
+        );
 
         println!("\n{} {:?}", "Input file:".green().bold(), self.input_path);
-        println!("{} {}", "File size:".green().bold(), format_bytes(file_size).yellow());
-        println!("{} {}", "Part size:".green().bold(), format_bytes(self.part_size).yellow());
+        println!(
+            "{} {}",
+            "File size:".green().bold(),
+            format_bytes(file_size).yellow()
+        );
+        println!(
+            "{} {}",
+            "Part size:".green().bold(),
+            format_bytes(self.part_size).yellow()
+        );
 
-        let num_parts = (file_size + self.part_size - 1) / self.part_size;
-        println!("{} {}\n", "Total parts:".green().bold(), num_parts.to_string().cyan());
+        let num_parts = file_size.div_ceil(self.part_size);
+        println!(
+            "{} {}\n",
+            "Total parts:".green().bold(),
+            num_parts.to_string().cyan()
+        );
 
         let pb = ProgressBar::new(file_size);
         pb.set_style(
@@ -77,14 +95,16 @@ impl FileSplitter {
                 let remaining_in_part = self.part_size - bytes_written_in_part;
                 let to_read = (BUFFER_SIZE as u64).min(remaining_in_part) as usize;
 
-                let bytes_read = reader.read(&mut buffer[..to_read])
+                let bytes_read = reader
+                    .read(&mut buffer[..to_read])
                     .context("Failed to read from input file")?;
 
                 if bytes_read == 0 {
                     break;
                 }
 
-                writer.write_all(&buffer[..bytes_read])
+                writer
+                    .write_all(&buffer[..bytes_read])
                     .context("Failed to write to part file")?;
 
                 bytes_written_in_part += bytes_read as u64;
@@ -92,8 +112,7 @@ impl FileSplitter {
                 pb.set_position(total_written);
             }
 
-            writer.flush()
-                .context("Failed to flush part file")?;
+            writer.flush().context("Failed to flush part file")?;
 
             part_paths.push(part_path);
             part_number += 1;
@@ -101,9 +120,19 @@ impl FileSplitter {
 
         pb.finish_with_message("Split complete!".green().to_string());
 
-        println!("\n{}", "═══════════════════════════════════════".bright_cyan());
-        println!("{} {}", "✓ Successfully created".green().bold(), format!("{} parts", part_paths.len()).cyan().bold());
-        println!("{}", "═══════════════════════════════════════".bright_cyan());
+        println!(
+            "\n{}",
+            "═══════════════════════════════════════".bright_cyan()
+        );
+        println!(
+            "{} {}",
+            "✓ Successfully created".green().bold(),
+            format!("{} parts", part_paths.len()).cyan().bold()
+        );
+        println!(
+            "{}",
+            "═══════════════════════════════════════".bright_cyan()
+        );
 
         println!("\n{}", "Part files:".yellow().bold());
         for (i, part) in part_paths.iter().enumerate() {
@@ -115,12 +144,12 @@ impl FileSplitter {
     }
 
     fn get_part_path(&self, part_number: u32) -> PathBuf {
-        let file_name = self.input_path.file_name()
+        let file_name = self
+            .input_path
+            .file_name()
             .unwrap_or_else(|| std::ffi::OsStr::new("file"));
 
-        let part_name = format!("{}.part{:03}",
-                                file_name.to_string_lossy(),
-                                part_number);
+        let part_name = format!("{}.part{:03}", file_name.to_string_lossy(), part_number);
 
         self.input_path.with_file_name(part_name)
     }
@@ -137,4 +166,65 @@ fn format_bytes(bytes: u64) -> String {
     }
 
     format!("{:.2} {}", size, UNITS[unit_index])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use std::io::Write;
+
+    #[test]
+    fn test_format_bytes() {
+        assert_eq!(format_bytes(100), "100.00 B");
+        assert_eq!(format_bytes(1024), "1.00 KB");
+        assert_eq!(format_bytes(1048576), "1.00 MB");
+        assert_eq!(format_bytes(1073741824), "1.00 GB");
+        assert_eq!(format_bytes(1099511627776), "1.00 TB");
+    }
+
+    #[test]
+    fn test_new_validates_file_exists() {
+        let result = FileSplitter::new("nonexistent_file.txt", 1024);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_new_validates_part_size() {
+        let temp_file = "test_temp_file.txt";
+        fs::File::create(temp_file)
+            .unwrap()
+            .write_all(b"test")
+            .unwrap();
+
+        let result = FileSplitter::new(temp_file, 0);
+        assert!(result.is_err());
+
+        fs::remove_file(temp_file).unwrap();
+    }
+
+    #[test]
+    fn test_split_and_verify() {
+        let test_file = "test_split_file.bin";
+        let test_data = vec![0u8; 10000];
+
+        fs::File::create(test_file)
+            .unwrap()
+            .write_all(&test_data)
+            .unwrap();
+
+        let splitter = FileSplitter::new(test_file, 3000).unwrap();
+        let parts = splitter.split().unwrap();
+
+        assert_eq!(parts.len(), 4);
+
+        for part in &parts {
+            assert!(part.exists());
+        }
+
+        fs::remove_file(test_file).unwrap();
+        for part in parts {
+            fs::remove_file(part).unwrap();
+        }
+    }
 }
