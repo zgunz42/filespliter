@@ -139,8 +139,7 @@ where
         .map(|p| std::fs::metadata(p).map(|m| m.len()).unwrap_or(0))
         .sum();
 
-    let output_file =
-        File::create(output_path).context("Failed to create output file")?;
+    let output_file = File::create(output_path).context("Failed to create output file")?;
 
     let mut writer = BufWriter::with_capacity(BUFFER_SIZE, output_file);
     let mut total_bytes = 0u64;
@@ -155,8 +154,8 @@ where
             message: format!("Joining part {}/{}", index + 1, total_parts),
         });
 
-        let part_file = File::open(part_path)
-            .context(format!("Failed to open part file: {:?}", part_path))?;
+        let part_file =
+            File::open(part_path).context(format!("Failed to open part file: {:?}", part_path))?;
 
         let mut reader = BufReader::with_capacity(BUFFER_SIZE, part_file);
         let mut buffer = vec![0u8; BUFFER_SIZE];

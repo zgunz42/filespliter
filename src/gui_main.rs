@@ -74,8 +74,8 @@ impl FileSplitterApp {
                 ui.add_space(15.0);
 
                 ui.horizontal(|ui| {
-                    let button = egui::Button::new("  📂 Choose File  ")
-                        .min_size(egui::vec2(150.0, 40.0));
+                    let button =
+                        egui::Button::new("  📂 Choose File  ").min_size(egui::vec2(150.0, 40.0));
                     if ui.add_enabled(!is_processing, button).clicked() {
                         if let Some(path) = rfd::FileDialog::new().pick_file() {
                             self.split_state.input_file = Some(path);
@@ -135,9 +135,10 @@ impl FileSplitterApp {
                 ui.horizontal(|ui| {
                     ui.label(egui::RichText::new("Custom size (bytes):").size(14.0));
                     ui.add_space(10.0);
-                    let text_edit = egui::TextEdit::singleline(&mut self.split_state.part_size_text)
-                        .desired_width(200.0)
-                        .font(egui::TextStyle::Monospace);
+                    let text_edit =
+                        egui::TextEdit::singleline(&mut self.split_state.part_size_text)
+                            .desired_width(200.0)
+                            .font(egui::TextStyle::Monospace);
                     ui.add_enabled(!is_processing, text_edit);
                 });
 
@@ -194,12 +195,9 @@ impl FileSplitterApp {
                     if size > 0 {
                         ui.add_space(15.0);
                         ui.label(
-                            egui::RichText::new(format!(
-                                "Selected: {}",
-                                core::format_bytes(size)
-                            ))
-                            .size(14.0)
-                            .color(egui::Color32::from_rgb(0, 128, 0)),
+                            egui::RichText::new(format!("Selected: {}", core::format_bytes(size)))
+                                .size(14.0)
+                                .color(egui::Color32::from_rgb(0, 128, 0)),
                         );
                     }
                 }
@@ -216,9 +214,10 @@ impl FileSplitterApp {
 
         ui.horizontal(|ui| {
             ui.add_space(ui.available_width() / 2.0 - 100.0);
-            let button = egui::Button::new(egui::RichText::new("  🚀 SPLIT FILE  ").size(16.0).strong())
-                .fill(egui::Color32::from_rgb(59, 130, 246))
-                .min_size(egui::vec2(200.0, 50.0));
+            let button =
+                egui::Button::new(egui::RichText::new("  🚀 SPLIT FILE  ").size(16.0).strong())
+                    .fill(egui::Color32::from_rgb(59, 130, 246))
+                    .min_size(egui::vec2(200.0, 50.0));
             if ui.add_enabled(can_process, button).clicked() {
                 self.start_split();
             }
@@ -291,7 +290,8 @@ impl FileSplitterApp {
                                     if let Some(start_time) = self.split_state.start_time {
                                         let elapsed = start_time.elapsed().as_secs_f64();
                                         if progress.current_bytes > 0 && elapsed > 0.0 {
-                                            let bytes_per_sec = progress.current_bytes as f64 / elapsed;
+                                            let bytes_per_sec =
+                                                progress.current_bytes as f64 / elapsed;
                                             let remaining_bytes =
                                                 progress.total_bytes - progress.current_bytes;
                                             let eta_secs = remaining_bytes as f64 / bytes_per_sec;
@@ -410,7 +410,11 @@ impl FileSplitterApp {
 
                             ui.add_space(15.0);
 
-                            ui.label(egui::RichText::new(e).size(13.0).color(egui::Color32::DARK_RED));
+                            ui.label(
+                                egui::RichText::new(e)
+                                    .size(13.0)
+                                    .color(egui::Color32::DARK_RED),
+                            );
 
                             ui.add_space(20.0);
 
@@ -549,9 +553,10 @@ impl FileSplitterApp {
 
         ui.horizontal(|ui| {
             ui.add_space(ui.available_width() / 2.0 - 100.0);
-            let button = egui::Button::new(egui::RichText::new("  🔗 JOIN FILES  ").size(16.0).strong())
-                .fill(egui::Color32::from_rgb(139, 92, 246))
-                .min_size(egui::vec2(200.0, 50.0));
+            let button =
+                egui::Button::new(egui::RichText::new("  🔗 JOIN FILES  ").size(16.0).strong())
+                    .fill(egui::Color32::from_rgb(139, 92, 246))
+                    .min_size(egui::vec2(200.0, 50.0));
             if ui.add_enabled(can_process, button).clicked() {
                 self.start_join();
             }
@@ -621,7 +626,8 @@ impl FileSplitterApp {
                                     if let Some(start_time) = self.join_state.start_time {
                                         let elapsed = start_time.elapsed().as_secs_f64();
                                         if progress.current_bytes > 0 && elapsed > 0.0 {
-                                            let bytes_per_sec = progress.current_bytes as f64 / elapsed;
+                                            let bytes_per_sec =
+                                                progress.current_bytes as f64 / elapsed;
                                             let remaining_bytes =
                                                 progress.total_bytes - progress.current_bytes;
                                             let eta_secs = remaining_bytes as f64 / bytes_per_sec;
@@ -733,7 +739,11 @@ impl FileSplitterApp {
 
                             ui.add_space(15.0);
 
-                            ui.label(egui::RichText::new(e).size(13.0).color(egui::Color32::DARK_RED));
+                            ui.label(
+                                egui::RichText::new(e)
+                                    .size(13.0)
+                                    .color(egui::Color32::DARK_RED),
+                            );
 
                             ui.add_space(20.0);
 
@@ -834,17 +844,14 @@ impl eframe::App for FileSplitterApp {
                 let split_selected = self.active_tab == Tab::Split;
                 let join_selected = self.active_tab == Tab::Join;
 
-                let split_button = egui::Button::new(
-                    egui::RichText::new("  ✂️  Split  ")
-                        .size(15.0)
-                        .strong(),
-                )
-                .fill(if split_selected {
-                    egui::Color32::from_rgb(59, 130, 246)
-                } else {
-                    egui::Color32::from_rgb(226, 232, 240)
-                })
-                .min_size(egui::vec2(120.0, 40.0));
+                let split_button =
+                    egui::Button::new(egui::RichText::new("  ✂️  Split  ").size(15.0).strong())
+                        .fill(if split_selected {
+                            egui::Color32::from_rgb(59, 130, 246)
+                        } else {
+                            egui::Color32::from_rgb(226, 232, 240)
+                        })
+                        .min_size(egui::vec2(120.0, 40.0));
 
                 if ui.add(split_button).clicked() {
                     self.active_tab = Tab::Split;
@@ -852,17 +859,14 @@ impl eframe::App for FileSplitterApp {
 
                 ui.add_space(10.0);
 
-                let join_button = egui::Button::new(
-                    egui::RichText::new("  🔗 Join  ")
-                        .size(15.0)
-                        .strong(),
-                )
-                .fill(if join_selected {
-                    egui::Color32::from_rgb(139, 92, 246)
-                } else {
-                    egui::Color32::from_rgb(226, 232, 240)
-                })
-                .min_size(egui::vec2(120.0, 40.0));
+                let join_button =
+                    egui::Button::new(egui::RichText::new("  🔗 Join  ").size(15.0).strong())
+                        .fill(if join_selected {
+                            egui::Color32::from_rgb(139, 92, 246)
+                        } else {
+                            egui::Color32::from_rgb(226, 232, 240)
+                        })
+                        .min_size(egui::vec2(120.0, 40.0));
 
                 if ui.add(join_button).clicked() {
                     self.active_tab = Tab::Join;
