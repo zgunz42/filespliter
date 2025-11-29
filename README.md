@@ -1,8 +1,8 @@
 # File Splitter
 
-[![CI](https://github.com/YOUR_USERNAME/filesplitter/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/filesplitter/actions/workflows/ci.yml)
-[![Release](https://github.com/YOUR_USERNAME/filesplitter/actions/workflows/release.yml/badge.svg)](https://github.com/YOUR_USERNAME/filesplitter/actions/workflows/release.yml)
-[![Security Audit](https://github.com/YOUR_USERNAME/filesplitter/actions/workflows/security.yml/badge.svg)](https://github.com/YOUR_USERNAME/filesplitter/actions/workflows/security.yml)
+[![CI](https://github.com/zgunz42/filesplitter/actions/workflows/ci.yml/badge.svg)](https://github.com/zgunz42/filesplitter/actions/workflows/ci.yml)
+[![Release](https://github.com/zgunz42/filesplitter/actions/workflows/release.yml/badge.svg)](https://github.com/zgunz42/filesplitter/actions/workflows/release.yml)
+[![Security Audit](https://github.com/zgunz42/filesplitter/actions/workflows/security.yml/badge.svg)](https://github.com/zgunz42/filesplitter/actions/workflows/security.yml)
 
 A fast, efficient file splitter and joiner written in Rust. Designed for splitting large files (like RAR archives) into smaller parts and reassembling them.
 
@@ -44,7 +44,7 @@ Download pre-built binaries from the [Releases](../../releases) page:
 
 **Linux (x86_64):**
 ```bash
-wget https://github.com/YOUR_USERNAME/filesplitter/releases/latest/download/filesplitter-linux-amd64.tar.gz
+wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-linux-amd64.tar.gz
 tar xzf filesplitter-linux-amd64.tar.gz
 chmod +x filesplitter
 sudo mv filesplitter /usr/local/bin/
@@ -52,7 +52,7 @@ sudo mv filesplitter /usr/local/bin/
 
 **Linux (ARM64):**
 ```bash
-wget https://github.com/YOUR_USERNAME/filesplitter/releases/latest/download/filesplitter-linux-arm64.tar.gz
+wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-linux-arm64.tar.gz
 tar xzf filesplitter-linux-arm64.tar.gz
 chmod +x filesplitter
 sudo mv filesplitter /usr/local/bin/
@@ -60,7 +60,7 @@ sudo mv filesplitter /usr/local/bin/
 
 **macOS (Intel):**
 ```bash
-wget https://github.com/YOUR_USERNAME/filesplitter/releases/latest/download/filesplitter-macos-amd64.tar.gz
+wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-macos-amd64.tar.gz
 tar xzf filesplitter-macos-amd64.tar.gz
 chmod +x filesplitter
 sudo mv filesplitter /usr/local/bin/
@@ -68,7 +68,7 @@ sudo mv filesplitter /usr/local/bin/
 
 **macOS (Apple Silicon):**
 ```bash
-wget https://github.com/YOUR_USERNAME/filesplitter/releases/latest/download/filesplitter-macos-arm64.tar.gz
+wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-macos-arm64.tar.gz
 tar xzf filesplitter-macos-arm64.tar.gz
 chmod +x filesplitter
 sudo mv filesplitter /usr/local/bin/
@@ -83,7 +83,7 @@ sudo mv filesplitter /usr/local/bin/
 
 **Linux (x86_64):**
 ```bash
-wget https://github.com/YOUR_USERNAME/filesplitter/releases/latest/download/filesplitter-gui-linux-amd64.tar.gz
+wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-gui-linux-amd64.tar.gz
 tar xzf filesplitter-gui-linux-amd64.tar.gz
 chmod +x filesplitter-gui
 sudo mv filesplitter-gui /usr/local/bin/
@@ -91,7 +91,7 @@ sudo mv filesplitter-gui /usr/local/bin/
 
 **Linux (ARM64):**
 ```bash
-wget https://github.com/YOUR_USERNAME/filesplitter/releases/latest/download/filesplitter-gui-linux-arm64.tar.gz
+wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-gui-linux-arm64.tar.gz
 tar xzf filesplitter-gui-linux-arm64.tar.gz
 chmod +x filesplitter-gui
 sudo mv filesplitter-gui /usr/local/bin/
@@ -99,7 +99,7 @@ sudo mv filesplitter-gui /usr/local/bin/
 
 **macOS (Intel):**
 ```bash
-wget https://github.com/YOUR_USERNAME/filesplitter/releases/latest/download/filesplitter-gui-macos-amd64.tar.gz
+wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-gui-macos-amd64.tar.gz
 tar xzf filesplitter-gui-macos-amd64.tar.gz
 chmod +x filesplitter-gui
 sudo mv filesplitter-gui /usr/local/bin/
@@ -107,7 +107,7 @@ sudo mv filesplitter-gui /usr/local/bin/
 
 **macOS (Apple Silicon):**
 ```bash
-wget https://github.com/YOUR_USERNAME/filesplitter/releases/latest/download/filesplitter-gui-macos-arm64.tar.gz
+wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-gui-macos-arm64.tar.gz
 tar xzf filesplitter-gui-macos-arm64.tar.gz
 chmod +x filesplitter-gui
 sudo mv filesplitter-gui /usr/local/bin/
@@ -127,7 +127,7 @@ sudo mv filesplitter-gui /usr/local/bin/
 **Build steps:**
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/filesplitter.git
+git clone https://github.com/zgunz42/filesplitter.git
 cd filesplitter
 
 # Build both CLI and GUI in release mode
