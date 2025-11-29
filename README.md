@@ -1,8 +1,8 @@
 # File Splitter
 
-[![CI](https://github.com/zgunz42/filesplitter/actions/workflows/ci.yml/badge.svg)](https://github.com/zgunz42/filesplitter/actions/workflows/ci.yml)
-[![Release](https://github.com/zgunz42/filesplitter/actions/workflows/release.yml/badge.svg)](https://github.com/zgunz42/filesplitter/actions/workflows/release.yml)
-[![Security Audit](https://github.com/zgunz42/filesplitter/actions/workflows/security.yml/badge.svg)](https://github.com/zgunz42/filesplitter/actions/workflows/security.yml)
+[![CI](https://github.com/zgunz42/filespliter/actions/workflows/ci.yml/badge.svg)](https://github.com/zgunz42/filespliter/actions/workflows/ci.yml)
+[![Release](https://github.com/zgunz42/filespliter/actions/workflows/release.yml/badge.svg)](https://github.com/zgunz42/filespliter/actions/workflows/release.yml)
+[![Security Audit](https://github.com/zgunz42/filespliter/actions/workflows/security.yml/badge.svg)](https://github.com/zgunz42/filespliter/actions/workflows/security.yml)
 
 A fast, efficient file splitter and joiner written in Rust. Designed for splitting large files (like RAR archives) into smaller parts and reassembling them.
 
@@ -19,7 +19,7 @@ A fast, efficient file splitter and joiner written in Rust. Designed for splitti
 - **Memory Efficient**: Streams data in chunks without loading entire file into memory
 - **Human-Readable Sizes**: Displays file sizes in MB/GB format automatically
 
-### GUI Application (`filesplitter-gui`)
+### GUI Application (`filespliter-gui`)
 - **Cross-platform GUI**: Works on Windows, macOS, and Linux
 - **Intuitive Interface**: Simple tab-based design for Split and Join operations
 - **File Pickers**: Native file dialogs for easy file selection
@@ -28,7 +28,7 @@ A fast, efficient file splitter and joiner written in Rust. Designed for splitti
 - **Non-blocking Operations**: File operations run in background threads
 - **Status Display**: Shows current operation, bytes processed, and estimated completion time
 
-### CLI Application (`filesplitter`)
+### CLI Application (`filespliter`)
 - **Colored Output**: Beautiful colored terminal output for better readability
 - **CLI Interface**: User-friendly command-line interface using clap
 - **Error Handling**: Comprehensive error handling with colored error messages
@@ -44,38 +44,38 @@ Download pre-built binaries from the [Releases](../../releases) page:
 
 **Linux (x86_64):**
 ```bash
-wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-linux-amd64.tar.gz
-tar xzf filesplitter-linux-amd64.tar.gz
-chmod +x filesplitter
-sudo mv filesplitter /usr/local/bin/
+wget https://github.com/zgunz42/filespliter/releases/latest/download/filespliter-linux-amd64.tar.gz
+tar xzf filespliter-linux-amd64.tar.gz
+chmod +x filespliter
+sudo mv filespliter /usr/local/bin/
 ```
 
 **Linux (ARM64):**
 ```bash
-wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-linux-arm64.tar.gz
-tar xzf filesplitter-linux-arm64.tar.gz
-chmod +x filesplitter
-sudo mv filesplitter /usr/local/bin/
+wget https://github.com/zgunz42/filespliter/releases/latest/download/filespliter-linux-arm64.tar.gz
+tar xzf filespliter-linux-arm64.tar.gz
+chmod +x filespliter
+sudo mv filespliter /usr/local/bin/
 ```
 
 **macOS (Intel):**
 ```bash
-wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-macos-amd64.tar.gz
-tar xzf filesplitter-macos-amd64.tar.gz
-chmod +x filesplitter
-sudo mv filesplitter /usr/local/bin/
+wget https://github.com/zgunz42/filespliter/releases/latest/download/filespliter-macos-amd64.tar.gz
+tar xzf filespliter-macos-amd64.tar.gz
+chmod +x filespliter
+sudo mv filespliter /usr/local/bin/
 ```
 
 **macOS (Apple Silicon):**
 ```bash
-wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-macos-arm64.tar.gz
-tar xzf filesplitter-macos-arm64.tar.gz
-chmod +x filesplitter
-sudo mv filesplitter /usr/local/bin/
+wget https://github.com/zgunz42/filespliter/releases/latest/download/filespliter-macos-arm64.tar.gz
+tar xzf filespliter-macos-arm64.tar.gz
+chmod +x filespliter
+sudo mv filespliter /usr/local/bin/
 ```
 
 **Windows:**
-1. Download `filesplitter-windows-amd64.exe.zip` from [Releases](../../releases)
+1. Download `filespliter-windows-amd64.exe.zip` from [Releases](../../releases)
 2. Extract the zip file
 3. Add the directory to your PATH or run directly
 
@@ -83,40 +83,40 @@ sudo mv filesplitter /usr/local/bin/
 
 **Linux (x86_64):**
 ```bash
-wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-gui-linux-amd64.tar.gz
-tar xzf filesplitter-gui-linux-amd64.tar.gz
-chmod +x filesplitter-gui
-sudo mv filesplitter-gui /usr/local/bin/
+wget https://github.com/zgunz42/filespliter/releases/latest/download/filespliter-gui-linux-amd64.tar.gz
+tar xzf filespliter-gui-linux-amd64.tar.gz
+chmod +x filespliter-gui
+sudo mv filespliter-gui /usr/local/bin/
 ```
 
 **Linux (ARM64):**
 ```bash
-wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-gui-linux-arm64.tar.gz
-tar xzf filesplitter-gui-linux-arm64.tar.gz
-chmod +x filesplitter-gui
-sudo mv filesplitter-gui /usr/local/bin/
+wget https://github.com/zgunz42/filespliter/releases/latest/download/filespliter-gui-linux-arm64.tar.gz
+tar xzf filespliter-gui-linux-arm64.tar.gz
+chmod +x filespliter-gui
+sudo mv filespliter-gui /usr/local/bin/
 ```
 
 **macOS (Intel):**
 ```bash
-wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-gui-macos-amd64.tar.gz
-tar xzf filesplitter-gui-macos-amd64.tar.gz
-chmod +x filesplitter-gui
-sudo mv filesplitter-gui /usr/local/bin/
+wget https://github.com/zgunz42/filespliter/releases/latest/download/filespliter-gui-macos-amd64.tar.gz
+tar xzf filespliter-gui-macos-amd64.tar.gz
+chmod +x filespliter-gui
+sudo mv filespliter-gui /usr/local/bin/
 ```
 
 **macOS (Apple Silicon):**
 ```bash
-wget https://github.com/zgunz42/filesplitter/releases/latest/download/filesplitter-gui-macos-arm64.tar.gz
-tar xzf filesplitter-gui-macos-arm64.tar.gz
-chmod +x filesplitter-gui
-sudo mv filesplitter-gui /usr/local/bin/
+wget https://github.com/zgunz42/filespliter/releases/latest/download/filespliter-gui-macos-arm64.tar.gz
+tar xzf filespliter-gui-macos-arm64.tar.gz
+chmod +x filespliter-gui
+sudo mv filespliter-gui /usr/local/bin/
 ```
 
 **Windows:**
-1. Download `filesplitter-gui-windows-amd64.exe.zip` from [Releases](../../releases)
+1. Download `filespliter-gui-windows-amd64.exe.zip` from [Releases](../../releases)
 2. Extract the zip file
-3. Run `filesplitter-gui.exe` directly or add to your PATH
+3. Run `filespliter-gui.exe` directly or add to your PATH
 
 ### Building from Source
 
@@ -127,20 +127,20 @@ sudo mv filesplitter-gui /usr/local/bin/
 **Build steps:**
 ```bash
 # Clone the repository
-git clone https://github.com/zgunz42/filesplitter.git
-cd filesplitter
+git clone https://github.com/zgunz42/filespliter.git
+cd filespliter
 
 # Build both CLI and GUI in release mode
 cargo build --release --all
 
 # The binaries will be at:
-# - target/release/filesplitter (CLI)
-# - target/release/filesplitter-gui (GUI)
+# - target/release/filespliter (CLI)
+# - target/release/filespliter-gui (GUI)
 # On Windows: .exe extension
 
 # Or build individually:
-cargo build --release --bin filesplitter        # CLI only
-cargo build --release --bin filesplitter-gui    # GUI only
+cargo build --release --bin filespliter        # CLI only
+cargo build --release --bin filespliter-gui    # GUI only
 ```
 
 **Run tests:**
@@ -151,10 +151,10 @@ cargo test --all-features
 **Install locally:**
 ```bash
 # Install CLI
-cargo install --path . --bin filesplitter
+cargo install --path . --bin filespliter
 
 # Install GUI
-cargo install --path . --bin filesplitter-gui
+cargo install --path . --bin filespliter-gui
 
 # Install both
 cargo install --path . --bins
@@ -169,10 +169,10 @@ The GUI application provides an easy-to-use interface for both split and join op
 **Running the GUI:**
 ```bash
 # From binary
-./target/release/filesplitter-gui
+./target/release/filespliter-gui
 
 # Or if installed
-filesplitter-gui
+filespliter-gui
 ```
 
 **Split Files:**
@@ -204,7 +204,7 @@ The command-line version is perfect for scripts and automation.
 Split a file into parts of specified size:
 
 ```bash
-./target/release/filesplitter split --input file.rar --size 10485760
+./target/release/filespliter split --input file.rar --size 10485760
 ```
 
 This splits `file.rar` into parts of 10MB (10485760 bytes) each. Parts will be named:
@@ -218,7 +218,7 @@ This splits `file.rar` into parts of 10MB (10485760 bytes) each. Parts will be n
 Reassemble parts back into the original file:
 
 ```bash
-./target/release/filesplitter join --input file.rar.part001 --output file.rar
+./target/release/filespliter join --input file.rar.part001 --output file.rar
 ```
 
 The program automatically detects and joins all sequential parts (part001, part002, etc.)
@@ -228,13 +228,13 @@ The program automatically detects and joins all sequential parts (part001, part0
 ### Split a 100MB file into 25MB parts
 
 ```bash
-./target/release/filesplitter split --input archive.rar --size 26214400
+./target/release/filespliter split --input archive.rar --size 26214400
 ```
 
 ### Split a 38GB file into 4GB parts
 
 ```bash
-./target/release/filesplitter split --input large_archive.rar --size 4294967296
+./target/release/filespliter split --input large_archive.rar --size 4294967296
 ```
 
 This will create 10 parts (9 full 4GB parts + 1 smaller final part).
@@ -242,7 +242,7 @@ This will create 10 parts (9 full 4GB parts + 1 smaller final part).
 ### Join the parts back
 
 ```bash
-./target/release/filesplitter join --input archive.rar.part001 --output archive_restored.rar
+./target/release/filespliter join --input archive.rar.part001 --output archive_restored.rar
 ```
 
 ## Output Features
@@ -306,7 +306,7 @@ The program fully supports very large files:
 - File size: 40,802,189,312 bytes
 - Part size: 4,294,967,296 bytes
 - Number of parts: 10
-- Command: `./target/release/filesplitter split --input file.rar --size 4294967296`
+- Command: `./target/release/filespliter split --input file.rar --size 4294967296`
 
 **Progress Tracking:**
 Both split and join operations show real-time progress percentages, essential for monitoring long-running operations on large files.
