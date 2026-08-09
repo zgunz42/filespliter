@@ -1,3 +1,5 @@
+
+
 # File Splitter
 
 [![CI](https://github.com/zgunz42/filespliter/actions/workflows/ci.yml/badge.svg)](https://github.com/zgunz42/filespliter/actions/workflows/ci.yml)
@@ -315,9 +317,10 @@ Both split and join operations show real-time progress percentages, essential fo
 
 ```
 src/
-├── main.rs       # CLI interface and command handling
-├── splitter.rs   # File splitting logic
-└── joiner.rs     # File joining logic
+├── main.rs         # CLI interface and command handling
+├── gui_main.rs     # GUI application entry point
+├── splitter.rs     # File splitting logic
+└── joiner.rs       # File joining logic
 ```
 
 ### Code Patterns
